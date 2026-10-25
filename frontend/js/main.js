@@ -1,42 +1,9 @@
 const API_BASE = '/api';
 
-// Theme Toggle
-const themeToggleBtn = document.getElementById('theme-toggle');
+// Enforce Pure Light Mode Only
 const body = document.body;
-
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    body.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-}
-
-function toggleTheme() {
-    const currentTheme = body.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
-    
-    // Update charts if they exist
-    if (window.updateChartsTheme) {
-        window.updateChartsTheme();
-    }
-}
-
-function updateThemeIcon(theme) {
-    if(!themeToggleBtn) return;
-    if (theme === 'dark') {
-        themeToggleBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
-    } else {
-        themeToggleBtn.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
-    }
-}
-
-if(themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', toggleTheme);
-}
-
-initTheme();
+body.removeAttribute('data-theme');
+localStorage.removeItem('theme');
 
 // Toast Notifications
 function showToast(message, type = 'success') {
@@ -164,8 +131,43 @@ if (uploadZone) {
 
 function handleFileSelect() {
     if (fileInput.files.length > 0) {
-        document.getElementById('fileNameDisplay').textContent = `Selected: ${fileInput.files[0].name}`;
+        const file = fileInput.files[0];
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        const sizeText = file.size > 1024 * 1024 ? `${sizeMb} MB` : `${Math.round(file.size / 1024)} KB`;
+        const displayEl = document.getElementById('fileNameDisplay');
+        if (displayEl) {
+            displayEl.innerHTML = `
+                <div class="selected-file-box">
+                    <div class="d-flex align-items-center text-truncate me-2">
+                        <i class="bi bi-file-earmark-check text-primary fs-5 me-2"></i>
+                        <span class="text-truncate">${file.name}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge" style="background-color: var(--primary-border); color: var(--primary); font-size: 11px;">${sizeText}</span>
+                        <button type="button" class="btn btn-sm btn-link text-muted p-0" onclick="clearSelectedFile(event)" title="Remove file"><i class="bi bi-x-circle"></i></button>
+                    </div>
+                </div>
+            `;
+        }
     }
+}
+
+window.clearSelectedFile = (e) => {
+    if (e) e.stopPropagation();
+    fileInput.value = '';
+    const displayEl = document.getElementById('fileNameDisplay');
+    if (displayEl) displayEl.innerHTML = '';
+};
+
+// Live character and word counter for textInput
+const textInputEl = document.getElementById('textInput');
+const textCharCountEl = document.getElementById('textCharCount');
+if (textInputEl && textCharCountEl) {
+    textInputEl.addEventListener('input', () => {
+        const len = textInputEl.value.length;
+        const words = textInputEl.value.trim() ? textInputEl.value.trim().split(/\s+/).length : 0;
+        textCharCountEl.textContent = `${len.toLocaleString()} characters · ${words.toLocaleString()} words`;
+    });
 }
 
 if (generateBtn) {
@@ -206,19 +208,30 @@ if (generateBtn) {
             
             // 2. Generate FAQs
             const statusDiv = document.getElementById('downloadStatus');
-            if (statusDiv) statusDiv.style.display = 'block';
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '<i class="bi bi-cpu me-2" style="color: var(--primary-blue);"></i> Initializing local AI inference...';
+            }
 
             const pollInterval = setInterval(async () => {
                 try {
                     const progRes = await fetch(`${API_BASE}/progress`);
                     const progData = await progRes.json();
                     if (progData.progress && statusDiv) {
-                        statusDiv.textContent = progData.progress;
-                        const p = progData.progress.toLowerCase();
+                        const raw = String(progData.progress).trim();
+                        // Defensively filter out any HTTP access logs
+                        if (!raw.includes('HTTP/') && !raw.includes('127.0.0.1') && !raw.includes(' - - [') && !raw.startsWith('GET') && !raw.startsWith('POST')) {
+                            const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+                            const clean = lines[lines.length - 1];
+                            if (clean) {
+                                statusDiv.innerHTML = `<i class="bi bi-cpu me-2" style="color: var(--primary-blue);"></i> ${clean}`;
+                            }
+                        }
+                        const p = raw.toLowerCase();
                         if (p.includes('generating') || p.includes('ollama') || p.includes('model') || p.includes('stage b')) {
                             updateProgress('inventory', 'done');
                             updateProgress('generating', 'active');
-                        } else if (p.includes('verifying') || p.includes('deduplicat') || p.includes('verif')) {
+                        } else if (p.includes('verifying') || p.includes('deduplicat') || p.includes('verif') || p.includes('grounding')) {
                             updateProgress('generating', 'done');
                             updateProgress('verifying', 'active');
                         }

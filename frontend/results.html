@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQForge - Results & Verification</title>
+    <title>FaqForge — Generated FAQs & Verification</title>
+    <meta name="description" content="Generated FAQs with grounded page citations and offline AI verification.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
@@ -12,163 +13,202 @@
 <body>
     <!-- Splash Screen -->
     <div id="splash-screen" class="splash-screen">
-        <div class="splash-content">
-            <i class="bi bi-robot splash-icon"></i>
-            <h1 class="splash-text">FAQForge</h1>
+        <div class="text-center">
+            <i class="bi bi-cpu splash-icon"></i>
+            <h1 class="splash-text">FaqForge</h1>
         </div>
     </div>
 
+    <!-- Notification Toasts -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
     <div class="app-container">
-        <!-- Sidebar -->
+        <!-- Sidebar (White with Gray Border) -->
         <aside class="sidebar">
-            <div class="sidebar-header mb-4">
-                <a class="brand d-flex align-items-center text-decoration-none" href="/">
-                    <i class="bi bi-robot fs-3 me-2 text-primary"></i> <span class="fs-4 fw-bolder text-main">FAQForge</span>
-                </a>
-            </div>
-            <nav class="sidebar-nav flex-grow-1">
-                <a href="/" class="nav-link"><i class="bi bi-grid-1x2 me-3"></i> <span>Dashboard</span></a>
-                <a href="history.html" class="nav-link"><i class="bi bi-clock-history me-3"></i> <span>History</span></a>
-            </nav>
-            <div class="sidebar-footer mt-auto">
-                <div class="ai-status-pill p-2 mb-3 bg-light rounded text-center small text-muted border">
-                    <span id="sidebarEngineStatus"><i class="bi bi-circle-fill text-success me-1"></i> AI Engine Ready</span>
+            <a class="brand-wrapper" href="/">
+                <div class="brand-icon">
+                    <i class="bi bi-cpu-fill"></i>
                 </div>
-                <button id="theme-toggle" class="theme-toggle w-100 d-flex justify-content-between align-items-center px-3" aria-label="Toggle Theme">
-                    <span><i class="bi bi-moon-stars-fill me-2"></i> Theme</span>
-                </button>
+                <div class="brand-info">
+                    <span class="brand-title">FaqForge</span>
+                    <span class="brand-badge">Offline AI Tool</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="sidebar-nav flex-grow-1">
+                <a href="/" class="nav-link">
+                    <i class="bi bi-grid-1x2"></i>
+                    <span>Studio Dashboard</span>
+                </a>
+                <a href="history.html" class="nav-link">
+                    <i class="bi bi-clock-history"></i>
+                    <span>History Vault</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="ai-engine-card">
+                    <div class="engine-status-row">
+                        <span class="text-muted" style="font-size: 11px; text-transform: uppercase; font-weight: 600;">AI Engine</span>
+                        <span class="status-dot-sm"></span>
+                    </div>
+                    <div class="small text-truncate fw-semibold" id="sidebarEngineStatus" style="color: var(--text-primary);">
+                        <i class="bi bi-circle-fill text-success me-1" style="font-size: 8px;"></i> Local AI Ready
+                    </div>
+                </div>
             </div>
         </aside>
 
+        <!-- Main Workspace -->
         <main class="main-content">
-            <header class="topbar mb-3">
-                <div>
-                    <h2 id="docTitle" class="mb-0 fw-bolder">Results</h2>
-                    <p class="text-muted small mb-0">Multi-Stage Generated FAQs & Source Verification</p>
+            <!-- Results Header -->
+            <header class="topbar">
+                <div class="topbar-title-group">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <a href="/" class="text-muted text-decoration-none small"><i class="bi bi-arrow-left me-1"></i> Dashboard</a>
+                        <span class="text-muted small">/</span>
+                        <span class="small fw-medium" style="color: var(--primary-blue);">FAQ Results</span>
+                    </div>
+                    <h1 class="page-title mb-0" id="docTitle">Generated Knowledge Base</h1>
                 </div>
+                
                 <div class="d-flex align-items-center gap-2">
                     <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle shadow-sm px-4" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-download me-2"></i> Export
+                        <button class="btn btn-primary dropdown-toggle px-3" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-download me-1"></i> Export FAQs
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 glass-panel">
-                            <li><a class="dropdown-item py-2" href="#" id="exportPdf"><i class="bi bi-file-pdf me-2 text-danger"></i> Export as PDF</a></li>
-                            <li><a class="dropdown-item py-2" href="#" id="exportDocx"><i class="bi bi-file-word me-2 text-primary"></i> Export as DOCX</a></li>
-                            <li><a class="dropdown-item py-2" href="#" id="exportTxt"><i class="bi bi-file-text me-2 text-secondary"></i> Export as TXT</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border p-1" style="border-color: var(--border-color);">
+                            <li><a class="dropdown-item py-2 small" href="#" id="exportPdf"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i> Export as PDF Document</a></li>
+                            <li><a class="dropdown-item py-2 small" href="#" id="exportDocx"><i class="bi bi-file-earmark-word me-2" style="color: var(--primary-blue);"></i> Export as Word (DOCX)</a></li>
+                            <li><a class="dropdown-item py-2 small" href="#" id="exportTxt"><i class="bi bi-file-earmark-text me-2 text-secondary"></i> Export as Plain Text (TXT)</a></li>
                         </ul>
                     </div>
                 </div>
             </header>
 
-            <!-- Document Coverage Summary Banner (Phase 8) -->
-            <div id="coverageBanner" class="card border-0 shadow-sm p-3 mb-4 bg-white">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-3 border-end">
-                        <div class="d-flex align-items-center">
-                            <div class="p-2 bg-primary-subtle text-primary rounded-circle me-3">
-                                <i class="bi bi-file-earmark-check fs-4"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Document Coverage</small>
-                                <h5 class="fw-bold mb-0" id="covPages">Pages Processed</h5>
-                            </div>
+            <!-- Metrics Summary Banner -->
+            <div id="coverageBanner" class="row g-3 mb-4">
+                <div class="col-xl-3 col-sm-6">
+                    <div class="metric-card">
+                        <div class="metric-icon-box primary">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 11px;">Coverage</small>
+                            <h4 class="card-heading mb-0" id="covPages">Pages Processed</h4>
                         </div>
                     </div>
-                    <div class="col-md-3 border-end">
-                        <div class="d-flex align-items-center">
-                            <div class="p-2 bg-success-subtle text-success rounded-circle me-3">
-                                <i class="bi bi-shield-check fs-4"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Verification Rate</small>
-                                <h5 class="fw-bold mb-0 text-success" id="covVerified">100% Verified</h5>
-                            </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="metric-card">
+                        <div class="metric-icon-box emerald">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 11px;">Verification</small>
+                            <h4 class="card-heading mb-0 text-success" id="covVerified">100% Verified</h4>
                         </div>
                     </div>
-                    <div class="col-md-3 border-end">
-                        <div class="d-flex align-items-center">
-                            <div class="p-2 bg-info-subtle text-info rounded-circle me-3">
-                                <i class="bi bi-cpu fs-4"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Inference Engine</small>
-                                <h5 class="fw-bold mb-0 text-dark" id="covEngine">Local AI</h5>
-                            </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="metric-card">
+                        <div class="metric-icon-box teal">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 11px;">Inference Model</small>
+                            <h4 class="card-heading mb-0" id="covEngine">Local AI</h4>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center">
-                            <div class="p-2 bg-secondary-subtle text-secondary rounded-circle me-3">
-                                <i class="bi bi-funnel fs-4"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Quality Filtering</small>
-                                <h5 class="fw-bold mb-0 text-secondary" id="covDuplicates">0 Duplicates</h5>
-                            </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="metric-card">
+                        <div class="metric-icon-box amber">
+                            <i class="bi bi-funnel"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 11px;">Quality Filter</small>
+                            <h4 class="card-heading mb-0" id="covDuplicates">0 Duplicates Filtered</h4>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabs & Filters -->
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                <ul class="nav nav-tabs mb-0" id="resultsTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-semibold" id="faqs-tab" data-bs-toggle="tab" data-bs-target="#faqs-tab-pane" type="button" role="tab">
-                            <i class="bi bi-card-list me-1"></i> Generated FAQs (<span id="faqCountHeader">0</span>)
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fw-semibold" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis-tab-pane" type="button" role="tab">
-                            <i class="bi bi-bar-chart me-1"></i> Document Analytics
-                        </button>
-                    </li>
-                </ul>
+            <!-- Search, Filter & Tabs Toolbar -->
+            <div class="card p-3 mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <ul class="nav nav-tabs-custom mb-0" id="resultsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="faqs-tab" data-bs-toggle="tab" data-bs-target="#faqs-tab-pane" type="button" role="tab">
+                                <i class="bi bi-card-checklist me-1"></i> Generated FAQs (<span id="faqCountHeader">0</span>)
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis-tab-pane" type="button" role="tab">
+                                <i class="bi bi-pie-chart me-1"></i> Document Analytics
+                            </button>
+                        </li>
+                    </ul>
 
-                <!-- Filter Controls -->
-                <div class="d-flex align-items-center gap-2" id="filterBar">
-                    <select id="statusFilter" class="form-select form-select-sm shadow-sm" style="width: 160px;">
-                        <option value="all">All Statuses</option>
-                        <option value="verified">Verified Only</option>
-                        <option value="needs_review">Needs Review</option>
-                    </select>
-                    <select id="categoryFilter" class="form-select form-select-sm shadow-sm" style="width: 160px;">
-                        <option value="all">All Categories</option>
-                    </select>
+                    <!-- Search and Filters -->
+                    <div class="d-flex flex-wrap align-items-center gap-2" id="filterBar">
+                        <div class="input-group" style="width: 240px;">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted" style="border-color: var(--border-color);"><i class="bi bi-search"></i></span>
+                            <input type="text" id="faqSearchInput" class="form-control border-start-0" placeholder="Search FAQs..." style="padding-left: 0;">
+                        </div>
+
+                        <select id="statusFilter" class="form-select" style="width: 150px;">
+                            <option value="all">All Statuses</option>
+                            <option value="verified">Verified Only</option>
+                            <option value="needs_review">Needs Review</option>
+                        </select>
+                        
+                        <select id="categoryFilter" class="form-select" style="width: 160px;">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="tab-content" id="resultsTabContent">
-                <!-- FAQs Tab -->
+                <!-- FAQs Tab Pane -->
                 <div class="tab-pane fade show active" id="faqs-tab-pane" role="tabpanel">
-                    <div id="faqList" class="row g-4"></div>
-                    <div id="faqEmpty" class="empty-state d-none text-center p-5">
-                        <i class="bi bi-inbox text-primary fs-1"></i>
-                        <h3 class="fw-bolder mt-3">No FAQs match filter</h3>
-                        <p class="text-muted">Try adjusting your filters or generating with different settings.</p>
+                    <div id="faqList" class="row g-3"></div>
+                    
+                    <div id="faqEmpty" class="d-none text-center p-5 card">
+                        <i class="bi bi-inbox text-muted fs-1 mb-2"></i>
+                        <h3 class="card-heading">No FAQs match your search or filter</h3>
+                        <p class="text-muted small">Try adjusting your search query or setting the filter to "All Categories".</p>
                     </div>
                 </div>
 
-                <!-- Analysis Tab -->
+                <!-- Analysis Tab Pane -->
                 <div class="tab-pane fade" id="analysis-tab-pane" role="tabpanel">
-                    <div class="row g-4">
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="card border-0 h-100 p-4 shadow-sm">
-                                <h5 class="fw-bold mb-4">Top Keywords (TF-IDF)</h5>
-                                <canvas id="keywordChart"></canvas>
+                            <div class="card p-4 h-100">
+                                <h3 class="card-heading mb-3"><i class="bi bi-bar-chart me-2" style="color: var(--primary-blue);"></i> Top Keywords (TF-IDF Scored)</h3>
+                                <div style="min-height: 260px;">
+                                    <canvas id="keywordChart"></canvas>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card border-0 h-100 p-4 shadow-sm">
-                                <h5 class="fw-bold mb-4">Entity Distribution (NER)</h5>
-                                <canvas id="entityChart"></canvas>
+                            <div class="card p-4 h-100">
+                                <h3 class="card-heading mb-3"><i class="bi bi-pie-chart me-2" style="color: var(--primary-blue);"></i> Entity Classification (spaCy NER)</h3>
+                                <div style="min-height: 260px;" class="d-flex align-items-center justify-content-center">
+                                    <canvas id="entityChart"></canvas>
+                                </div>
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="card border-0 p-4 shadow-sm">
-                                <h5 class="fw-bold mb-3">Extracted Document Entities</h5>
+                            <div class="card p-4">
+                                <h3 class="card-heading mb-3"><i class="bi bi-tags me-2" style="color: var(--primary-blue);"></i> Extracted Document Entities</h3>
                                 <div id="entityBadges" class="d-flex flex-wrap gap-2"></div>
                             </div>
                         </div>
@@ -178,31 +218,31 @@
         </main>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1">
+    <!-- Edit FAQ Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg glass-panel">
-                <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title fw-bold">Edit FAQ</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title card-heading"><i class="bi bi-pencil-square me-2" style="color: var(--primary-blue);"></i> Edit FAQ Item</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold text-muted small">CATEGORY</label>
+                        <label class="form-label" for="editCategory">Category</label>
                         <input type="text" class="form-control" id="editCategory">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold text-muted small">QUESTION</label>
+                        <label class="form-label" for="editQ">Question</label>
                         <textarea class="form-control" id="editQ" rows="2"></textarea>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label fw-semibold text-muted small">ANSWER</label>
+                        <label class="form-label" for="editA">Answer</label>
                         <textarea class="form-control" id="editA" rows="4"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary px-4" id="saveEditBtn">Save changes</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn"><i class="bi bi-check2 me-1"></i> Save Changes</button>
                 </div>
             </div>
         </div>
@@ -217,7 +257,7 @@
         let editingFaqId = null;
         let chartInstances = [];
 
-        document.getElementById('docTitle').innerHTML = `Results for <span class="text-primary">${currentDocName}</span>`;
+        document.getElementById('docTitle').innerHTML = `Results for <span style="color: var(--primary-blue);">${currentDocName}</span>`;
 
         if (currentDocId) {
             document.getElementById('exportPdf').href = `${API_BASE}/export/${currentDocId}/pdf`;
@@ -239,7 +279,7 @@
             
             const sideStatus = document.getElementById('sidebarEngineStatus');
             if (sideStatus) {
-                sideStatus.innerHTML = `<i class="bi bi-cpu-fill text-success me-1"></i> ${report.engine || 'Local AI Engine'}`;
+                sideStatus.innerHTML = `<i class="bi bi-circle-fill text-success me-1" style="font-size: 8px;"></i> ${report.engine || 'Local AI Ready'}`;
             }
 
             // Populate Category Filter
@@ -268,10 +308,17 @@
 
             const statusFilter = document.getElementById('statusFilter').value;
             const categoryFilter = document.getElementById('categoryFilter').value;
+            const searchTerm = (document.getElementById('faqSearchInput')?.value || '').toLowerCase().trim();
 
             const filteredFaqs = faqs.filter(faq => {
                 if (statusFilter !== 'all' && faq.verification_status !== statusFilter) return false;
                 if (categoryFilter !== 'all' && faq.category !== categoryFilter) return false;
+                if (searchTerm) {
+                    const matchQ = (faq.question || '').toLowerCase().includes(searchTerm);
+                    const matchA = (faq.answer || '').toLowerCase().includes(searchTerm);
+                    const matchC = (faq.category || '').toLowerCase().includes(searchTerm);
+                    if (!matchQ && !matchA && !matchC) return false;
+                }
                 return true;
             });
 
@@ -283,16 +330,14 @@
             }
 
             filteredFaqs.forEach(faq => {
-                const confScore = Math.round((faq.overall_score || 0.95) * 100);
-                
                 // Verification badge
                 let verifBadge = '';
                 if (faq.verification_status === 'verified') {
-                    verifBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1" title="${faq.verification_reason || 'Verified'}"><i class="bi bi-shield-check me-1"></i> Verified</span>`;
+                    verifBadge = `<span class="badge-status verified" title="${faq.verification_reason || 'Verified against document source'}"><i class="bi bi-shield-check"></i> Verified</span>`;
                 } else if (faq.verification_status === 'needs_review' || faq.needs_review) {
-                    verifBadge = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1" title="${faq.verification_reason || 'Needs review'}"><i class="bi bi-exclamation-triangle-fill me-1"></i> Needs Review</span>`;
+                    verifBadge = `<span class="badge-status review" title="${faq.verification_reason || 'Needs review'}"><i class="bi bi-exclamation-triangle-fill"></i> Needs Review</span>`;
                 } else {
-                    verifBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1" title="${faq.verification_reason || 'Rejected'}"><i class="bi bi-x-circle-fill me-1"></i> Rejected</span>`;
+                    verifBadge = `<span class="badge-status rejected" title="${faq.verification_reason || 'Rejected'}"><i class="bi bi-x-circle-fill"></i> Rejected</span>`;
                 }
 
                 // Source page display
@@ -300,45 +345,47 @@
                 const section = faq.source_section || 'General';
 
                 const col = document.createElement('div');
-                col.className = 'col-lg-6 mb-4';
+                col.className = 'col-lg-6 mb-2';
                 col.innerHTML = `
-                    <div class="card faq-card border-0 h-100 shadow-sm" id="faq-${faq.id}">
-                        <div class="card-header pb-2 border-bottom-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="card faq-card h-100 d-flex flex-column" id="faq-${faq.id}">
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-secondary opacity-75 fw-normal rounded-pill px-3">${faq.category || 'General'}</span>
-                                <span class="badge border border-secondary text-secondary rounded-pill px-2 fw-normal small">${faq.question_type || 'Factual'}</span>
+                                <span class="badge-category-tag">${faq.category || 'General'}</span>
+                                <span class="badge-type-tag">${faq.question_type || 'Factual'}</span>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 ${verifBadge}
-                                <span class="badge border bg-light text-dark rounded-pill px-2 py-1 small" title="Confidence Score">
-                                    ${confScore}%
-                                </span>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="small text-muted mb-2">
-                                <i class="bi bi-file-earmark-text me-1"></i> Page ${pages} · <span class="fw-semibold">${section}</span>
+                        <div class="card-body flex-grow-1">
+                            <div class="text-xs text-muted mb-2 d-flex align-items-center gap-1">
+                                <i class="bi bi-file-earmark-text" style="color: var(--primary-blue);"></i>
+                                <span>Page ${pages}</span>
+                                <span>•</span>
+                                <span class="fw-medium text-secondary">${section}</span>
                             </div>
-                            <h5 class="fw-bold mb-3 text-primary question-text" style="line-height: 1.4;">${faq.question}</h5>
-                            <p class="card-text answer-text text-muted" style="line-height: 1.6;">${faq.answer}</p>
+                            <h3 class="question-text mb-2">${faq.question}</h3>
+                            <p class="answer-text mb-3">${faq.answer}</p>
                             
-                            <!-- Expandable Supporting Excerpt (Phase 6) -->
-                            <div class="mt-3">
+                            <!-- Expandable Supporting Source Excerpt Panel -->
+                            <div class="mt-2 pt-2 border-top" style="border-color: var(--border-color) !important;">
                                 <button class="btn btn-sm btn-link p-0 text-decoration-none text-muted small" type="button" data-bs-toggle="collapse" data-bs-target="#excerpt-${faq.id}">
-                                    <i class="bi bi-quote me-1"></i> View Source Excerpt
+                                    <i class="bi bi-quote me-1" style="color: var(--primary-blue);"></i> View Source Excerpt
                                 </button>
                                 <div class="collapse mt-2" id="excerpt-${faq.id}">
-                                    <div class="p-3 bg-light rounded border text-muted small fst-italic">
-                                        "${faq.supporting_excerpt || faq.context || 'Direct factual statement from source document.'}"
+                                    <div class="faq-citation-box">
+                                        <div class="text-xs text-muted mb-1 fw-semibold text-uppercase">Original Document Text (Page ${pages}):</div>
+                                        <div class="fst-italic text-secondary">"${faq.supporting_excerpt || faq.context || 'Direct factual statement verified from source text.'}"</div>
+                                        ${faq.verification_reason ? `<div class="mt-2 text-xs text-success fw-medium"><i class="bi bi-check-circle me-1"></i> ${faq.verification_reason}</div>` : ''}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-top-0 pt-0 text-end">
-                            <button class="btn btn-sm btn-outline-secondary me-2 px-3 rounded-pill shadow-sm" onclick="copyFAQ(${faq.id})" title="Copy to clipboard"><i class="bi bi-clipboard me-1"></i> Copy</button>
-                            <button class="btn btn-sm btn-outline-secondary me-2 px-3 rounded-pill shadow-sm" onclick="editFAQ(${faq.id})"><i class="bi bi-pencil me-1"></i> Edit</button>
-                            <button class="btn btn-sm btn-outline-info me-2 px-3 rounded-pill shadow-sm" onclick="regenerateFAQ(${faq.id})"><i class="bi bi-arrow-repeat me-1"></i> Re-roll</button>
-                            <button class="btn btn-sm btn-outline-danger px-3 rounded-pill shadow-sm" onclick="deleteFAQ(${faq.id})"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-sm btn-outline-secondary me-1 px-3" onclick="copyFAQ(${faq.id})" title="Copy to clipboard"><i class="bi bi-clipboard me-1"></i> Copy</button>
+                            <button class="btn btn-sm btn-outline-secondary me-1 px-3" onclick="editFAQ(${faq.id})"><i class="bi bi-pencil me-1"></i> Edit</button>
+                            <button class="btn btn-sm btn-outline-secondary me-1 px-3" onclick="regenerateFAQ(${faq.id})"><i class="bi bi-arrow-repeat me-1" style="color: var(--primary-blue);"></i> Re-roll</button>
+                            <button class="btn btn-sm btn-outline-secondary px-2" onclick="deleteFAQ(${faq.id})" title="Delete FAQ"><i class="bi bi-trash" style="color: var(--status-error);"></i></button>
                         </div>
                     </div>
                 `;
@@ -359,14 +406,15 @@
 
         document.getElementById('statusFilter').addEventListener('change', renderFAQs);
         document.getElementById('categoryFilter').addEventListener('change', renderFAQs);
+        document.getElementById('faqSearchInput').addEventListener('input', renderFAQs);
 
         function renderAnalysis() {
             if(!genData.analysis) return;
             chartInstances.forEach(c => c.destroy());
             chartInstances = [];
             
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
-            const textColor = isDark ? '#f8fafc' : '#0f172a';
+            const textColor = '#475569';
+            const gridColor = '#E2E8F0';
 
             const kws = (genData.analysis.keywords || []).slice(0, 7);
             const ctxKw = document.getElementById('keywordChart').getContext('2d');
@@ -377,16 +425,17 @@
                     datasets: [{
                         label: 'TF-IDF Score',
                         data: kws.map(k => k.score),
-                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                        borderRadius: 6
+                        backgroundColor: '#244B78',
+                        borderRadius: 4
                     }]
                 },
                 options: { 
-                    responsive: true, 
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { ticks: { color: textColor } },
-                        x: { ticks: { color: textColor } }
+                        y: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        x: { ticks: { color: textColor }, grid: { display: false } }
                     }
                 }
             }));
@@ -404,19 +453,27 @@
                     labels: Object.keys(entCounts),
                     datasets: [{
                         data: Object.values(entCounts),
-                        backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+                        backgroundColor: ['#244B78', '#0F766E', '#15803D', '#B45309', '#475569', '#64748B'],
+                        borderWidth: 1,
+                        borderColor: '#FFFFFF'
                     }]
                 },
                 options: { 
-                    responsive: true, 
-                    plugins: { legend: { position: 'right', labels: { color: textColor } } }
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            position: 'right', 
+                            labels: { color: textColor, font: { family: 'Inter', size: 12 } } 
+                        } 
+                    }
                 }
             }));
 
             const badgeContainer = document.getElementById('entityBadges');
             badgeContainer.innerHTML = '';
-            ents.slice(0, 20).forEach(e => {
-                badgeContainer.innerHTML += `<span class="badge border border-primary text-primary bg-transparent rounded-pill px-3 py-2 fw-normal">${e.entity} <span class="opacity-50 ms-1">${e.entity_type}</span></span>`;
+            ents.slice(0, 24).forEach(e => {
+                badgeContainer.innerHTML += `<span class="format-pill">${e.entity} <span class="text-muted ms-1 text-uppercase" style="font-size: 10px;">${e.entity_type}</span></span>`;
             });
         }
 
@@ -449,15 +506,15 @@
                     genData.faqs[idx].answer = a;
                     renderFAQs();
                     editModal.hide();
-                    showToast('FAQ updated successfully');
-                } else throw new Error('Update failed');
-            } catch (e) {
-                showToast(e.message, 'error');
+                    showToast('FAQ updated successfully!');
+                }
+            } catch(e) {
+                showToast('Failed to update FAQ', 'error');
             }
         });
 
         window.deleteFAQ = async (id) => {
-            if(!confirm('Delete this FAQ?')) return;
+            if(!confirm('Are you sure you want to delete this FAQ?')) return;
             try {
                 const res = await fetch(`${API_BASE}/faqs/${id}`, { method: 'DELETE' });
                 if(res.ok) {
@@ -465,25 +522,32 @@
                     renderFAQs();
                     showToast('FAQ deleted');
                 }
-            } catch(e) { showToast(e.message, 'error'); }
+            } catch(e) {
+                showToast('Failed to delete FAQ', 'error');
+            }
         };
 
         window.regenerateFAQ = async (id) => {
+            showToast('Re-rolling question with local AI...', 'primary');
             try {
-                showToast('Regenerating FAQ with AI...', 'info');
                 const res = await fetch(`${API_BASE}/faqs/${id}/regenerate`, { method: 'POST' });
                 if(res.ok) {
-                    const newFaq = await res.json();
+                    const data = await res.json();
                     const idx = genData.faqs.findIndex(f => f.id === id);
-                    genData.faqs[idx] = newFaq;
-                    renderFAQs();
-                    showToast('FAQ regenerated successfully!');
-                } else throw new Error('Regeneration failed');
-            } catch(e) { showToast(e.message, 'error'); }
+                    if(idx !== -1) {
+                        genData.faqs[idx] = data.faq;
+                        renderFAQs();
+                        showToast('FAQ re-rolled successfully!');
+                    }
+                }
+            } catch(e) {
+                showToast('Failed to re-roll FAQ', 'error');
+            }
         };
 
         document.getElementById('analysis-tab').addEventListener('shown.bs.tab', renderAnalysis);
-        
+
+        // Initial setup
         renderCoverageBanner();
         renderFAQs();
     </script>

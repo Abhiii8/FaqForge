@@ -135,10 +135,15 @@ def generate_faqs():
         return jsonify({'error': 'Document not found'}), 404
         
     try:
+        if progress_catcher:
+            progress_catcher.set("Extracting document content and analyzing sections...")
+
         # Check if original file is in upload folder to preserve full page structure
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], doc.filename)
         if os.path.exists(filepath) and doc.file_type in ['pdf', 'docx']:
             doc_data = DocumentProcessor.extract_document(filepath)
+            if progress_catcher:
+                progress_catcher.set("Generating questions with local Ollama Qwen2.5 3B...")
             nlp_results = nlp_pipeline.process_document_data(
                 doc_data=doc_data,
                 num_faqs=num_faqs,
@@ -147,6 +152,8 @@ def generate_faqs():
                 question_focus=question_focus
             )
         else:
+            if progress_catcher:
+                progress_catcher.set("Generating questions with local Ollama Qwen2.5 3B...")
             nlp_results = nlp_pipeline.process_text(
                 text=doc.original_text,
                 num_faqs=num_faqs,
@@ -155,6 +162,9 @@ def generate_faqs():
                 question_focus=question_focus
             )
         
+        if progress_catcher:
+            progress_catcher.set("Verifying factual grounding and deduplicating...")
+
         doc.processed_text = nlp_results['processed_text']
         
         # Save Keywords
