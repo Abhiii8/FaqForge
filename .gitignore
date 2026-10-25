@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Database
+*.db
+*.sqlite3
+database/faqforge.db
+database/*.db
+
+# Uploads and Exports
+uploads/*
+!uploads/.gitkeep
+exports/*
+!exports/.gitkeep
+
+# Large models cache
+models/*
+!models/.gitkeep
+
+# Environments & secrets
+.env
+.env.*
+
+# Logs
+*.log
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp

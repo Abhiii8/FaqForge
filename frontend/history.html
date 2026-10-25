@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQForge NLP - History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <i class="bi bi-robot splash-icon"></i>
+            <h1 class="splash-text">FAQForge</h1>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header mb-4">
+                <a class="brand d-flex align-items-center text-decoration-none" href="/">
+                    <i class="bi bi-robot fs-3 me-2 text-primary"></i> <span class="fs-4 fw-bolder text-main">FAQForge</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav flex-grow-1">
+                <a href="/" class="nav-link"><i class="bi bi-grid-1x2 me-3"></i> <span>Dashboard</span></a>
+                <a href="history.html" class="nav-link active"><i class="bi bi-clock-history me-3"></i> <span>History</span></a>
+
+            </nav>
+            <div class="sidebar-footer mt-auto">
+                <button id="theme-toggle" class="theme-toggle w-100 d-flex justify-content-between align-items-center px-3" aria-label="Toggle Theme">
+                    <span><i class="bi bi-moon-stars-fill me-2"></i> Theme</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h2 class="mb-0 fw-bolder">Processing History</h2>
+                    <p class="text-muted small mb-0">View previously processed documents</p>
+                </div>
+            </header>
+            
+            <div class="card p-0 border-0 overflow-hidden shadow-lg">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light opacity-75">
+                            <tr>
+                                <th class="border-0 ps-4 py-3">Filename</th>
+                                <th class="border-0 py-3">Date</th>
+                                <th class="border-0 py-3">Generated FAQs</th>
+                                <th class="border-0 text-end pe-4 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="historyEmpty" class="empty-state d-none">
+                    <i class="bi bi-folder2-open text-primary mb-3"></i>
+                    <h3>No documents yet</h3>
+                    <p class="text-muted">Process a document on the dashboard to see it here.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const tableBody = document.getElementById('historyTableBody');
+            const emptyState = document.getElementById('historyEmpty');
+            
+            try {
+                const res = await fetch('/api/documents');
+                if (!res.ok) throw new Error('Failed to load history');
+                const docs = await res.json();
+                
+                if (docs.length === 0) {
+                    emptyState.classList.remove('d-none');
+                    return;
+                }
+                
+                docs.forEach(doc => {
+                    const date = new Date(doc.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric', 
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">${doc.filename}</h6>
+                                    <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">${doc.file_type}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 text-muted fw-medium">${date}</td>
+                        <td class="py-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Document Processed
+                            </span>
+                        </td>
+                        <td class="pe-4 py-3 text-end">
+                            <a href="/api/export/${doc.id}/pdf" class="btn btn-sm btn-outline-danger shadow-sm me-2 rounded-pill px-3 fw-bold" title="Export PDF"><i class="bi bi-file-pdf"></i> PDF</a>
+                            <a href="/api/export/${doc.id}/docx" class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3 fw-bold" title="Export DOCX"><i class="bi bi-file-word"></i> DOCX</a>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (e) {
+                console.error(e);
+                emptyState.classList.remove('d-none');
+                emptyState.innerHTML = '<i class="bi bi-exclamation-triangle text-danger fs-1 mb-3 d-block"></i><h3 class="fw-bolder">Error</h3><p class="text-muted">Failed to load history from server.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
