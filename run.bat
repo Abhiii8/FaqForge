@@ -41,7 +41,7 @@ powershell -NoProfile -Command "try { (Invoke-WebRequest -Uri 'http://127.0.0.1:
 if errorlevel 1 (
     echo [INFO] Starting Ollama inference engine in background...
     start "" /B "%OLLAMA_CMD%" serve
-    timeout /t 3 /nobreak >nul
+    ping 127.0.0.1 -n 4 >nul
 ) else (
     echo [INFO] Ollama engine is already running on port 11434.
 )
@@ -49,7 +49,7 @@ if errorlevel 1 (
 echo [INFO] Checking qwen2.5:3b model...
 "%OLLAMA_CMD%" list | findstr /i "qwen2.5:3b" >nul 2>&1
 if errorlevel 1 (
-    echo [INFO] Downloading qwen2.5:3b model (one-time setup)...
+    echo [INFO] Downloading qwen2.5:3b model - one-time setup...
     "%OLLAMA_CMD%" pull qwen2.5:3b
 ) else (
     echo [INFO] Model qwen2.5:3b is ready.
