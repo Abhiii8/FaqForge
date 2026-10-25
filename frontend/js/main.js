@@ -139,11 +139,11 @@ function handleFileSelect() {
             displayEl.innerHTML = `
                 <div class="selected-file-box">
                     <div class="d-flex align-items-center text-truncate me-2">
-                        <i class="bi bi-file-earmark-check text-primary fs-5 me-2"></i>
-                        <span class="text-truncate">${file.name}</span>
+                        <i class="bi bi-file-earmark-check fs-5 me-2" style="color: var(--primary-accent);"></i>
+                        <span class="text-truncate fw-medium" style="font-family: var(--font-ui);">${file.name}</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge" style="background-color: var(--primary-border); color: var(--primary); font-size: 11px;">${sizeText}</span>
+                        <span class="badge border" style="background-color: var(--bg-selected); color: var(--primary-accent); border-color: var(--line-arch) !important; font-family: var(--font-mono); font-size: 11px;">${sizeText}</span>
                         <button type="button" class="btn btn-sm btn-link text-muted p-0" onclick="clearSelectedFile(event)" title="Remove file"><i class="bi bi-x-circle"></i></button>
                     </div>
                 </div>
