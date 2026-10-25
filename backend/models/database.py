@@ -17,6 +17,19 @@ class Document(db.Model):
     entities = db.relationship('Entity', backref='document', lazy=True, cascade="all, delete-orphan")
     faqs = db.relationship('FAQ', backref='document', lazy=True, cascade="all, delete-orphan")
 
+    def __init__(
+        self,
+        filename: str | None = None,
+        file_type: str | None = None,
+        original_text: str | None = None,
+        processed_text: str | None = None,
+        created_at: datetime | None = None,
+        **kwargs
+    ):
+        init_kwargs = {k: v for k, v in locals().items() if k not in ('self', 'kwargs', '__class__') and v is not None}
+        init_kwargs.update(kwargs)
+        super().__init__(**init_kwargs)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -34,6 +47,17 @@ class Keyword(db.Model):
     keyword = db.Column(db.String(100), nullable=False)
     score = db.Column(db.Float, nullable=False)
 
+    def __init__(
+        self,
+        document_id: int | None = None,
+        keyword: str | None = None,
+        score: float | None = None,
+        **kwargs
+    ):
+        init_kwargs = {k: v for k, v in locals().items() if k not in ('self', 'kwargs', '__class__') and v is not None}
+        init_kwargs.update(kwargs)
+        super().__init__(**init_kwargs)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -48,6 +72,17 @@ class Entity(db.Model):
     document_id = db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False)
     entity = db.Column(db.String(255), nullable=False)
     entity_type = db.Column(db.String(100), nullable=False)
+
+    def __init__(
+        self,
+        document_id: int | None = None,
+        entity: str | None = None,
+        entity_type: str | None = None,
+        **kwargs
+    ):
+        init_kwargs = {k: v for k, v in locals().items() if k not in ('self', 'kwargs', '__class__') and v is not None}
+        init_kwargs.update(kwargs)
+        super().__init__(**init_kwargs)
 
     def to_dict(self):
         return {
@@ -78,6 +113,30 @@ class FAQ(db.Model):
     verification_status = db.Column(db.String(50), nullable=True, default="verified")
     needs_review = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __init__(
+        self,
+        document_id: int | None = None,
+        question: str | None = None,
+        answer: str | None = None,
+        category: str | None = None,
+        question_type: str | None = None,
+        question_score: float | None = None,
+        answer_score: float | None = None,
+        overall_score: float | None = None,
+        context: str | None = None,
+        source_document: str | None = None,
+        source_pages: str | None = None,
+        source_section: str | None = None,
+        supporting_excerpt: str | None = None,
+        verification_status: str | None = None,
+        needs_review: bool | None = None,
+        created_at: datetime | None = None,
+        **kwargs
+    ):
+        init_kwargs = {k: v for k, v in locals().items() if k not in ('self', 'kwargs', '__class__') and v is not None}
+        init_kwargs.update(kwargs)
+        super().__init__(**init_kwargs)
 
     def to_dict(self):
         # Format source_pages into list of ints if possible

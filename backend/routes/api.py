@@ -169,13 +169,15 @@ def generate_faqs():
         
         # Save Keywords
         for kw in nlp_results.get('keywords', []):
-            k_obj = Keyword(document_id=doc.id, keyword=kw['keyword'], score=kw['score'])
-            db.session.add(k_obj)
+            if isinstance(kw, dict):
+                k_obj = Keyword(document_id=doc.id, keyword=kw.get('keyword', ''), score=float(kw.get('score', 0.0)))
+                db.session.add(k_obj)
             
         # Save Entities
         for ent in nlp_results.get('entities', []):
-            e_obj = Entity(document_id=doc.id, entity=ent['entity'], entity_type=ent['entity_type'])
-            db.session.add(e_obj)
+            if isinstance(ent, dict):
+                e_obj = Entity(document_id=doc.id, entity=ent.get('entity', ''), entity_type=ent.get('entity_type', 'MISC'))
+                db.session.add(e_obj)
             
         # Save Structured FAQs
         created_faqs = []
@@ -183,13 +185,13 @@ def generate_faqs():
             pages_val = ",".join(map(str, faq_data.get('source_pages', [1])))
             faq = FAQ(
                 document_id=doc.id,
-                question=faq_data['question'],
-                answer=faq_data['answer'],
+                question=faq_data.get('question', ''),
+                answer=faq_data.get('answer', ''),
                 category=faq_data.get('category', 'General'),
                 question_type=faq_data.get('question_type', 'factual'),
-                question_score=faq_data.get('question_score', 0.95),
-                answer_score=faq_data.get('answer_score', 0.95),
-                overall_score=faq_data.get('overall_score', 0.95),
+                question_score=float(faq_data.get('question_score', 0.95)),
+                answer_score=float(faq_data.get('answer_score', 0.95)),
+                overall_score=float(faq_data.get('overall_score', 0.95)),
                 context=faq_data.get('context', ''),
                 source_document=faq_data.get('source_document', doc.filename),
                 source_pages=pages_val,
