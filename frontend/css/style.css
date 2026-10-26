@@ -4,7 +4,7 @@
    Light-Only Theme | Architectural Lines | Custom Technical Graphics
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Geist:wght@400;500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 /* --- Coordinated Design Tokens (Strict Light Theme Only) --- */
 :root {
@@ -51,10 +51,12 @@
   --status-error-border: #FECACA;
 
   /* Typography System */
-  --font-title: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-narrow: 'Inter Tight', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-title: 'Inter Tight', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-ui: 'Geist', 'Geist Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: 'Geist', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-code: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Component Radii */
   --radius-sm: 4px;
@@ -93,45 +95,45 @@ html, body {
 
 /* --- Typography Hierarchy --- */
 
-/* Main Page Title: Plus Jakarta Sans 28–32px, 600–700 */
+/* Main Page Title: Inter Tight 28–32px, 700 */
 h1, .page-title {
-  font-family: var(--font-title);
+  font-family: var(--font-narrow);
   font-size: 28px;
   font-weight: 700;
   line-height: 1.25;
   color: var(--text-primary);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   margin-top: 0;
 }
 
-/* Major Section Heading: Plus Jakarta Sans 19–22px, 600 */
+/* Major Section Heading: Inter Tight 19–22px, 700 */
 h2, .section-heading {
-  font-family: var(--font-title);
+  font-family: var(--font-narrow);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
   color: var(--text-primary);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.025em;
 }
 
-/* Card Heading: Geist Sans 15–17px, 600 */
+/* Card Heading: Inter Tight 15–17px, 600 */
 h3, h4, h5, .card-heading {
-  font-family: var(--font-ui);
+  font-family: var(--font-narrow);
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
-/* FAQ Question: Geist Sans 16–18px, 600 */
+/* FAQ Question: Inter Tight 16–18px, 600 */
 .question-text {
-  font-family: var(--font-ui);
+  font-family: var(--font-narrow);
   font-size: 16.5px;
   font-weight: 600;
   line-height: 1.45;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* FAQ Answer: Inter 14–15px, 400 */
@@ -160,19 +162,19 @@ nav, .nav-link, button, .btn, .form-label, .form-select, .form-control {
   font-weight: 500;
 }
 
-/* Metadata: Inter or IBM Plex Mono 12px, 400–500 */
+/* Metadata: Inter 12px, 400–500 */
 small, .text-xs, .metadata-text {
   font-size: 12px;
   line-height: 1.4;
   color: var(--text-muted);
 }
 
-/* Technical Annotations: IBM Plex Mono 11–13px, 400–500 */
+/* Technical Annotations & Badges: Geist Sans 11.5px, 500 */
 .technical-mono, .badge-type-tag, .font-mono, .arch-tag, .step-mono, .faq-index-pill {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: 11.5px;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.005em;
 }
 
 /* --- Layout Structure --- */
