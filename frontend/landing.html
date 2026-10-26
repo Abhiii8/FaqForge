@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaqForge — Offline AI Document FAQ Generator</title>
+    <meta name="description" content="Transform complex documents into verified, grounded FAQs 100% offline using local AI inference and factual grounding.">
+
+    <!-- Preconnect & Multi-Font Typography System -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Geist:wght@400;500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Landing Page Architectural Custom Styling */
+        .landing-body {
+            background-color: var(--bg-app);
+            overflow-x: hidden;
+            color: var(--text-secondary);
+        }
+
+        .landing-nav {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 0.85rem 2rem;
+        }
+
+        .landing-hero {
+            padding: 4.5rem 2rem 3rem 2rem;
+            position: relative;
+        }
+
+        .hero-headline {
+            font-family: var(--font-title);
+            font-size: clamp(32px, 4.5vw, 52px);
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subhead {
+            font-family: var(--font-body);
+            font-size: clamp(15px, 1.3vw, 17.5px);
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-width: 660px;
+        }
+
+        .blueprint-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.85rem;
+            background-color: var(--soft-blue-bg);
+            border: 1px solid var(--line-arch);
+            border-radius: var(--radius-pill);
+            color: var(--primary-accent);
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+        }
+
+        .hero-showcase-box {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-showcase-header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.65rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 1.5rem;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .stat-card:hover {
+            border-color: var(--line-arch);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px -3px rgba(15, 23, 42, 0.05);
+        }
+
+        .feature-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 1.75rem;
+            height: 100%;
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-accent);
+            box-shadow: 0 8px 24px -4px rgba(36, 75, 120, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .feature-card-corner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            border-top: 1.5px solid var(--line-arch);
+            border-left: 1.5px solid var(--line-arch);
+        }
+
+        .feature-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-input);
+            background-color: var(--soft-blue-bg);
+            border: 1px solid var(--line-arch);
+            color: var(--primary-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 1.15rem;
+        }
+
+        .step-num-pill {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-pill);
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--primary-accent);
+        }
+
+        .comparison-table th {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table td {
+            font-family: var(--font-body);
+            font-size: 13.5px;
+            padding: 1rem 1.25rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .landing-footer {
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+            padding: 3rem 2rem 2rem 2rem;
+        }
+    </style>
+</head>
+<body class="landing-body">
+
+    <!-- Top Navigation Bar -->
+    <header class="landing-nav">
+        <div class="container-xl d-flex align-items-center justify-content-between">
+            <a class="d-flex align-items-center gap-2 text-decoration-none" href="/">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                        <rect x="9" y="9" width="6" height="6"/>
+                        <line x1="9" y1="1" x2="9" y2="4"/>
+                        <line x1="15" y1="1" x2="15" y2="4"/>
+                        <line x1="9" y1="20" x2="9" y2="23"/>
+                        <line x1="15" y1="20" x2="15" y2="23"/>
+                        <line x1="20" y1="9" x2="23" y2="9"/>
+                        <line x1="20" y1="14" x2="23" y2="14"/>
+                        <line x1="1" y1="9" x2="4" y2="9"/>
+                        <line x1="1" y1="14" x2="4" y2="14"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-title">FaqForge</span>
+                    <span class="d-none d-sm-inline-block ms-1 technical-mono text-muted" style="font-size: 10px;">// v2.5</span>
+                </div>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="d-none d-md-flex align-items-center gap-4">
+                <a href="#features" class="text-decoration-none text-secondary small fw-medium">Features</a>
+                <a href="#architecture" class="text-decoration-none text-secondary small fw-medium">Architecture</a>
+                <a href="#pipeline" class="text-decoration-none text-secondary small fw-medium">How It Works</a>
+                <a href="#comparison" class="text-decoration-none text-secondary small fw-medium">Privacy Benchmark</a>
+            </nav>
+
+            <!-- Launch Studio Action -->
+            <div class="d-flex align-items-center gap-2">
+                <a href="/history.html" class="btn btn-outline-secondary d-none d-sm-inline-flex px-3">
+                    <i class="bi bi-clock-history me-1"></i> History Vault
+                </a>
+                <a href="/app" class="btn btn-primary px-3 shadow-sm">
+                    <span>Launch Studio</span>
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="landing-hero">
+        <div class="container-xl">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="blueprint-badge mb-3">
+                        <span class="status-dot"></span>
+                        <span>100% AIR-GAPPED // OLLAMA QWEN2.5 3B</span>
+                    </div>
+
+                    <h1 class="hero-headline mb-3">
+                        Transform Complex Documents into Grounded, Verified FAQs.
+                    </h1>
+
+                    <p class="hero-subhead mb-4">
+                        Extract deep knowledge, eliminate hallucinations, and generate structured question-and-answer pairs completely offline with zero cloud dependencies or data leaks.
+                    </p>
+
+                    <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                        <a href="/app" class="btn btn-primary px-4 py-2" style="font-size: 15px;">
+                            <i class="bi bi-magic me-1"></i> Launch FAQ Studio
+                        </a>
+                        <a href="#pipeline" class="btn btn-outline-secondary px-4 py-2" style="font-size: 15px;">
+                            <i class="bi bi-diagram-3 me-1"></i> View How It Works
+                        </a>
+                    </div>
+
+                    <!-- Trust indicators -->
+                    <div class="d-flex flex-wrap align-items-center gap-3 pt-2 text-muted technical-mono" style="font-size: 11.5px;">
+                        <span><i class="bi bi-shield-check text-success me-1"></i> Zero Cloud Telemetry</span>
+                        <span>•</span>
+                        <span><i class="bi bi-cpu text-primary me-1"></i> Local Ollama Acceleration</span>
+                        <span>•</span>
+                        <span><i class="bi bi-file-earmark-check text-secondary me-1"></i> Exact Page Citations</span>
+                    </div>
+                </div>
+
+                <!-- Right Hero Visual Showcase -->
+                <div class="col-lg-6">
+                    <div class="hero-showcase-box">
+                        <div class="hero-showcase-header">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge-status verified"><i class="bi bi-shield-check"></i> Verified Grounding</span>
+                                <span class="technical-mono text-muted" style="font-size: 11px;">SAMPLE: CAPSTONE_GUIDELINES.PDF</span>
+                            </div>
+                            <span class="technical-mono text-muted" style="font-size: 11px;">PAGE 1 OF 12</span>
+                        </div>
+
+                        <div class="p-4" style="background-color: var(--bg-surface);">
+                            <!-- Mockup FAQ Card 1 -->
+                            <div class="faq-card p-3 mb-3" style="border: 1px solid var(--border-color); border-radius: var(--radius-input);">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="faq-index-pill technical-mono">Q01</span>
+                                        <span class="badge-category-tag">Formatting</span>
+                                        <span class="badge-type-tag technical-mono">Procedural</span>
+                                    </div>
+                                    <span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> Grounded</span>
+                                </div>
+                                <h3 class="question-text mb-2" style="font-size: 15px;">What font sizes are required for headings and body content?</h3>
+                                <p class="answer-text mb-2" style="font-size: 13.5px;">
+                                    The project report requires font size 14 for all chapter headings and font size 12 for standard body paragraphs using 1.5 line spacing.
+                                </p>
+                                <div class="p-2 rounded mt-2" style="background-color: var(--bg-app); border-left: 3px solid var(--primary-accent); font-size: 12px;">
+                                    <div class="technical-mono text-muted fw-semibold mb-1">SOURCE EXCERPT (PAGE 2):</div>
+                                    <div class="text-secondary fst-italic">"Standard body text must be 12 pt with 1.5 line spacing. Main headings are set in 14 pt bold."</div>
+                                </div>
+                            </div>
+
+                            <!-- Mockup FAQ Card 2 (Compact) -->
+                            <div class="faq-card p-3" style="border: 1px solid var(--border-color); border-radius: var(--radius-input); opacity: 0.9;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="faq-index-pill technical-mono">Q02</span>
+                                        <span class="badge-category-tag">Evaluation</span>
+                                        <span class="badge-type-tag technical-mono">Factual</span>
+                                    </div>
+                                    <span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> Grounded</span>
+                                </div>
+                                <h3 class="question-text mb-1" style="font-size: 15px;">What is the deadline for preliminary synopsis submission?</h3>
+                                <p class="answer-text mb-0 text-truncate" style="font-size: 13.5px;">
+                                    The preliminary synopsis must be approved by the project coordinator within the first two weeks of semester commencement.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics / Stats Section -->
+    <section class="py-4 border-top border-bottom" style="background-color: var(--bg-surface); border-color: var(--border-color) !important;">
+        <div class="container-xl">
+            <div class="row g-4 text-center">
+                <div class="col-6 col-md-3">
+                    <div class="technical-mono text-muted text-uppercase mb-1" style="font-size: 11px;">Data Transmission</div>
+                    <div class="hero-headline text-primary mb-0" style="font-size: 32px; color: var(--primary-accent) !important;">0 KB</div>
+                    <div class="small text-muted">100% Air-Gapped Local</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="technical-mono text-muted text-uppercase mb-1" style="font-size: 11px;">Language Engine</div>
+                    <div class="hero-headline text-primary mb-0" style="font-size: 32px; color: var(--primary-accent) !important;">Qwen2.5</div>
+                    <div class="small text-muted">3 Billion Dense Parameters</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="technical-mono text-muted text-uppercase mb-1" style="font-size: 11px;">Grounding Accuracy</div>
+                    <div class="hero-headline text-primary mb-0" style="font-size: 32px; color: var(--status-success) !important;">100%</div>
+                    <div class="small text-muted">Deterministic Verification</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="technical-mono text-muted text-uppercase mb-1" style="font-size: 11px;">Supported Formats</div>
+                    <div class="hero-headline text-primary mb-0" style="font-size: 32px; color: var(--secondary-accent) !important;">PDF·DOCX</div>
+                    <div class="small text-muted">Page & Section Tracked</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works / Architectural Pipeline Section -->
+    <section id="pipeline" class="py-5">
+        <div class="container-xl">
+            <div class="text-center max-w-xl mx-auto mb-5" style="max-width: 620px;">
+                <div class="blueprint-badge mb-2">END-TO-END WORKFLOW</div>
+                <h2 class="section-heading mb-2" style="font-size: 26px;">Architectural Inference Pipeline</h2>
+                <p class="text-muted small">How FAQForge transforms unstructured documents into verifiable knowledge without cloud latency or hallucinations.</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Step 1 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="step-num-pill">STAGE 01</span>
+                            <i class="bi bi-file-earmark-arrow-up text-primary fs-5" style="color: var(--primary-accent);"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Structural Ingestion</h3>
+                        <p class="answer-text mb-0" style="font-size: 13.5px;">
+                            PyMuPDF and python-docx extract text page-by-page, detecting heading hierarchies and preserving structural citations.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="step-num-pill">STAGE 02</span>
+                            <i class="bi bi-diagram-2 text-primary fs-5" style="color: var(--secondary-accent);"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Semantic Inventory</h3>
+                        <p class="answer-text mb-0" style="font-size: 13.5px;">
+                            spaCy NER extracts key entities while TF-IDF vectorizers score high-value domain keywords to formulate question targets.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="step-num-pill">STAGE 03</span>
+                            <i class="bi bi-cpu text-primary fs-5" style="color: var(--primary-accent);"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Local Ollama Qwen2.5</h3>
+                        <p class="answer-text mb-0" style="font-size: 13.5px;">
+                            Qwen2.5 3B generates abstractive question-answer pairs using temperature 0.2 and structured JSON schema enforcement.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="stat-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="step-num-pill">STAGE 04</span>
+                            <i class="bi bi-shield-check text-success fs-5"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Grounded Verification</h3>
+                        <p class="answer-text mb-0" style="font-size: 13.5px;">
+                            The verification engine validates numbers, dates, and lexical root overlaps, pruning duplicates via Jaccard token similarity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Grid -->
+    <section id="features" class="py-5" style="background-color: var(--bg-surface); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+        <div class="container-xl">
+            <div class="text-center max-w-xl mx-auto mb-5" style="max-width: 620px;">
+                <div class="blueprint-badge mb-2">ENTERPRISE CAPABILITIES</div>
+                <h2 class="section-heading mb-2" style="font-size: 26px;">Built for Accuracy and Absolute Privacy</h2>
+                <p class="text-muted small">Everything needed to turn enterprise knowledge into verified, searchable FAQ repositories.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-card-corner"></div>
+                        <div class="feature-icon-box">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">100% Air-Gapped Execution</h3>
+                        <p class="answer-text mb-0">
+                            Zero data leaves your laptop. Process confidential contracts, proprietary codebases, or internal research without security clearance concerns.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-card-corner"></div>
+                        <div class="feature-icon-box">
+                            <i class="bi bi-quote"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Grounded Page Citations</h3>
+                        <p class="answer-text mb-0">
+                            Every single generated Q&A pair preserves the exact source page number and verbatim excerpt for effortless human verification.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-card-corner"></div>
+                        <div class="feature-icon-box">
+                            <i class="bi bi-funnel"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Intelligent Deduplication</h3>
+                        <p class="answer-text mb-0">
+                            Eliminates repetitive questions using Jaccard token similarity clustering, ensuring concise, non-overlapping FAQ documents.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-card-corner"></div>
+                        <div class="feature-icon-box">
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Interactive Document Analytics</h3>
+                        <p class="answer-text mb-0">
+                            Inspect TF-IDF keyword scores and spaCy Named Entity classification distributions through interactive visualization charts.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-card-corner"></div>
+                        <div class="feature-icon-box">
+                            <i class="bi bi-file-earmark-arrow-down"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Multi-Format Export Vault</h3>
+                        <p class="answer-text mb-0">
+                            Export your generated knowledge base with a single click into formatted PDF reports, Microsoft Word (DOCX), or plain text.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-card-corner"></div>
+                        <div class="feature-icon-box">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </div>
+                        <h3 class="card-heading mb-2">Individual Question Re-roll</h3>
+                        <p class="answer-text mb-0">
+                            Don't like a specific answer? Re-roll individual questions without re-running the entire document pipeline.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section (FaqForge vs Cloud APIs) -->
+    <section id="comparison" class="py-5">
+        <div class="container-xl">
+            <div class="text-center max-w-xl mx-auto mb-5" style="max-width: 620px;">
+                <div class="blueprint-badge mb-2">BENCHMARK COMPARISON</div>
+                <h2 class="section-heading mb-2" style="font-size: 26px;">Why Run FAQs Locally?</h2>
+                <p class="text-muted small">Compare local air-gapped inference against proprietary cloud LLM providers.</p>
+            </div>
+
+            <div class="card p-0 overflow-hidden shadow-subtle mx-auto" style="max-width: 860px;">
+                <div class="table-responsive">
+                    <table class="table comparison-table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">Dimension</th>
+                                <th style="width: 32%; color: var(--primary-accent);">FaqForge (Local AI)</th>
+                                <th style="width: 33%; color: var(--text-muted);">Cloud APIs (OpenAI / Gemini)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-semibold text-primary">Data Privacy</td>
+                                <td><span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> 100% On-Device</span></td>
+                                <td class="text-muted"><i class="bi bi-x-circle text-danger me-1"></i> Sent to external cloud servers</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-primary">Operational Cost</td>
+                                <td><span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> $0 Free Forever</span></td>
+                                <td class="text-muted"><i class="bi bi-x-circle text-danger me-1"></i> Pay-per-token API bills</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-primary">Internet Dependency</td>
+                                <td><span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> Works Fully Offline</span></td>
+                                <td class="text-muted"><i class="bi bi-x-circle text-danger me-1"></i> Requires stable internet</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-primary">Factual Verification</td>
+                                <td><span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> Deterministic Verifier</span></td>
+                                <td class="text-muted"><i class="bi bi-exclamation-triangle text-warning me-1"></i> Prone to unnoticed hallucinations</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-primary">Source Citations</td>
+                                <td><span class="badge-status verified"><i class="bi bi-check-circle-fill"></i> Page-level Tracking</span></td>
+                                <td class="text-muted"><i class="bi bi-x-circle text-danger me-1"></i> Raw ungrounded responses</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Call-To-Action Banner -->
+    <section class="py-5" style="background-color: var(--bg-selected); border-top: 1px solid var(--line-arch);">
+        <div class="container-xl text-center py-3">
+            <h2 class="hero-headline mb-3" style="font-size: 32px;">Ready to generate verified FAQs from your documents?</h2>
+            <p class="hero-subhead mx-auto mb-4">
+                Launch the studio dashboard, upload your first PDF or Word document, and get structured, grounded FAQs in seconds.
+            </p>
+            <a href="/app" class="btn btn-primary px-4 py-2" style="font-size: 16px;">
+                <span>Launch FAQ Studio</span>
+                <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="container-xl">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <span class="brand-title">FaqForge</span>
+                    <span class="technical-mono text-muted" style="font-size: 11px;">— Offline AI FAQ Engine</span>
+                </div>
+                <div class="d-flex align-items-center gap-4 text-muted small technical-mono">
+                    <a href="/app" class="text-decoration-none text-secondary">Studio Dashboard</a>
+                    <a href="/history.html" class="text-decoration-none text-secondary">History Vault</a>
+                    <a href="#pipeline" class="text-decoration-none text-secondary">Architecture</a>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-3 text-muted technical-mono" style="font-size: 11px;">
+                <div>Built with Ollama, Qwen2.5 3B, spaCy, and Flask. Zero cloud dependencies.</div>
+                <div>AIR-GAPPED COMPLIANT // v2.5.0</div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -58,9 +58,17 @@ def create_app(test_config=None):
     
     # Serve static frontend files
     @app.route('/')
+    @app.route('/landing')
+    @app.route('/landing.html')
     def index():
-        return app.send_static_file('index.html')
+        return app.send_static_file('landing.html')
         
+    @app.route('/app')
+    @app.route('/studio')
+    @app.route('/index.html')
+    def app_studio():
+        return app.send_static_file('index.html')
+
     @app.route('/results.html')
     def results():
         return app.send_static_file('results.html')
