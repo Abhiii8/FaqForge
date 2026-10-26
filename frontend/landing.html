@@ -66,8 +66,16 @@
         }
 
         .landing-hero {
-            padding: 4.5rem 2rem 3.5rem 2rem;
+            min-height: calc(100vh - 68px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3.5rem 2rem;
             position: relative;
+        }
+
+        .landing-hero > .container-xl {
+            width: 100%;
         }
 
         .hero-headline {
@@ -630,7 +638,7 @@
     </section>
 
     <!-- Key Metrics / Stats Section -->
-    <section class="py-4 border-top border-bottom" style="background-color: var(--bg-surface); border-color: var(--border-color) !important;">
+    <section class="py-4 py-md-5 border-top border-bottom" style="background-color: var(--bg-surface); border-color: var(--border-color) !important;">
         <div class="container-xl">
             <div class="row g-4 text-center">
                 <div class="col-6 col-md-3">
