@@ -301,3 +301,36 @@ def delete_faq(faq_id):
 def get_progress():
     line = progress_catcher.last_line if progress_catcher else ""
     return jsonify({'progress': line}), 200
+
+# =========================================================================
+# TEST SUITE & BENCHMARK ACCURACY ENDPOINTS
+# =========================================================================
+
+@api_bp.route('/tests/run', methods=['GET', 'POST'])
+def run_test_suite():
+    """Runs the comprehensive 20-case test suite and returns execution metrics and results."""
+    from tests.test_runner import TestRunner
+    runner = TestRunner()
+    results = runner.run_all()
+    return jsonify({
+        "status": "success",
+        "summary": results["summary"],
+        "tests": results["tests"],
+        "excel_download_url": "/api/tests/download-excel"
+    }), 200
+
+@api_bp.route('/tests/download-excel', methods=['GET'])
+def download_test_excel():
+    """Downloads the generated test_results.xlsx Excel workbook."""
+    from flask import send_file
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    excel_path = os.path.join(root_dir, "exports", "test_results.xlsx")
+    if not os.path.exists(excel_path):
+        from tests.test_runner import TestRunner
+        TestRunner().run_all()
+    return send_file(
+        excel_path,
+        as_attachment=True,
+        download_name="FAQForge_Test_Results_and_Accuracy.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )

@@ -11,6 +11,20 @@ class DocumentProcessor:
     Detects scanned/encrypted files and cleans page artifacts.
     """
 
+    @staticmethod
+    def clean_text(text: str) -> str:
+        """Sanitizes text, strips non-printable control characters, and normalizes blank lines."""
+        if not text:
+            return ""
+        cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+        cleaned = cleaned.replace('\r\n', '\n').replace('\r', '\n')
+        cleaned = re.sub(r'[ \t]+', ' ', cleaned)
+        cleaned = re.sub(r'\n\s*\n', '\n\n', cleaned)
+        cleaned = re.sub(r'\n{3,}', '\n\n', cleaned)
+        return cleaned.strip()
+
+    _clean_text = clean_text
+
     @classmethod
     def extract_text(cls, file_path: str) -> str:
         """Returns the full unified text extracted from the document."""

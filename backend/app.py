@@ -77,4 +77,11 @@ def create_app(test_config=None):
     def history():
         return app.send_static_file('history.html')
 
+    @app.route('/tests')
+    @app.route('/tests.html')
+    @app.route('/benchmark')
+    @app.route('/benchmark.html')
+    def test_benchmark():
+        return app.send_static_file('tests.html')
+
     return app
