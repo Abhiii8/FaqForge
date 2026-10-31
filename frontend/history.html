@@ -188,8 +188,16 @@
                     let fileIcon = 'bi-file-earmark-text';
                     let iconColor = 'text-secondary';
                     const ext = (doc.filename || '').split('.').pop().toLowerCase();
-                    if (ext === 'pdf') { fileIcon = 'bi-file-earmark-pdf'; iconColor = 'text-danger'; }
-                    else if (ext === 'docx') { fileIcon = 'bi-file-earmark-word'; iconColor = 'text-primary'; }
+                    if (doc.file_type === 'url' || (doc.filename || '').startsWith('http')) {
+                        fileIcon = 'bi-globe2';
+                        iconColor = 'text-success';
+                    } else if (ext === 'pdf') { 
+                        fileIcon = 'bi-file-earmark-pdf'; 
+                        iconColor = 'text-danger'; 
+                    } else if (ext === 'docx') { 
+                        fileIcon = 'bi-file-earmark-word'; 
+                        iconColor = 'text-primary'; 
+                    }
                     
                     const row = document.createElement('tr');
                     row.innerHTML = `

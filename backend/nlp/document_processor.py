@@ -3,10 +3,11 @@ import re
 from typing import Dict, Any, List
 import fitz  # PyMuPDF
 from docx import Document as DocxDocument
+from backend.nlp.web_processor import WebpageProcessor
 
 class DocumentProcessor:
     """
-    Advanced document extractor supporting PDF, DOCX, and TXT.
+    Advanced document extractor supporting PDF, DOCX, TXT, and Web URLs.
     Preserves page numbers, headings, tables, and section hierarchies.
     Detects scanned/encrypted files and cleans page artifacts.
     """
@@ -32,11 +33,20 @@ class DocumentProcessor:
         return data["text"]
 
     @classmethod
+    def extract_from_url(cls, url: str) -> Dict[str, Any]:
+        """Extracts structured document data directly from a website URL."""
+        return WebpageProcessor.extract_from_url(url)
+
+    @classmethod
     def extract_document(cls, file_path: str) -> Dict[str, Any]:
         """
         Extracts structured document data including page-by-page content,
         headings, detected sections, and extraction diagnostics.
+        Supports file paths and web URLs.
         """
+        if isinstance(file_path, str) and (file_path.startswith("http://") or file_path.startswith("https://")):
+            return cls.extract_from_url(file_path)
+
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"File not found: {file_path}")
 
@@ -47,8 +57,15 @@ class DocumentProcessor:
             return cls._extract_from_docx(file_path)
         elif ext == '.txt':
             return cls._extract_from_txt(file_path)
+        elif ext in ['.html', '.htm']:
+            with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
+                return WebpageProcessor.parse_html(f.read(), source_url=file_path)
+        elif ext == '.json':
+            import json
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
         else:
-            raise ValueError(f"Unsupported file format '{ext}'. Supported formats: .pdf, .docx, .txt")
+            raise ValueError(f"Unsupported file format '{ext}'. Supported formats: .pdf, .docx, .txt, .html, or Web URL")
 
     @classmethod
     def _extract_from_pdf(cls, file_path: str) -> Dict[str, Any]:

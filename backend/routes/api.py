@@ -1,8 +1,10 @@
 import os
+import json
 from flask import Blueprint, request, jsonify, current_app, Response
 from werkzeug.utils import secure_filename
 from backend.models.database import db, Document, FAQ, Keyword, Entity
 from backend.nlp.document_processor import DocumentProcessor
+from backend.nlp.web_processor import WebpageProcessor
 from backend.nlp.pipeline import NLPPipeline
 from backend.utils.progress import progress_catcher
 
@@ -71,21 +73,67 @@ def pull_ollama_model():
         return jsonify({"error": str(e)}), 500
 
 # =========================================================================
+# URL INSPECTION & WEBPAGE INGESTION
+# =========================================================================
+
+@api_bp.route('/url/inspect', methods=['POST'])
+def inspect_url():
+    """Fetches a URL and returns preview metadata without committing to database."""
+    data = request.json or {}
+    url = data.get('url', '').strip()
+    if not url:
+        return jsonify({'error': 'No URL provided'}), 400
+
+    try:
+        doc_data = DocumentProcessor.extract_from_url(url)
+        metadata = doc_data.get('metadata', {})
+        sample_text = doc_data.get('text', '')[:600]
+        return jsonify({
+            'success': True,
+            'title': metadata.get('title', 'Imported Webpage'),
+            'domain': metadata.get('domain', ''),
+            'description': metadata.get('description', ''),
+            'total_words': metadata.get('total_words', 0),
+            'section_count': doc_data.get('total_pages', 0),
+            'headings': doc_data.get('headings', [])[:12],
+            'sample_text': sample_text
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# =========================================================================
 # DOCUMENT UPLOAD & PARSING
 # =========================================================================
 
 @api_bp.route('/upload', methods=['POST'])
 def upload_file():
-    """Uploads file or text, extracts structure, and creates document record."""
-    if 'file' not in request.files and 'text' not in request.form:
-        return jsonify({'error': 'No file or text provided'}), 400
+    """Uploads file, text, or website URL, extracts structure, and creates document record."""
+    req_data = request.json if request.is_json else request.form
+
+    if 'file' not in request.files and 'text' not in req_data and 'url' not in req_data:
+        return jsonify({'error': 'No file, text, or URL provided'}), 400
 
     original_text = ""
     filename = "Manual Input"
     file_type = "txt"
     filepath = None
+    structured_doc_data = None
 
-    if 'file' in request.files:
+    # 1. URL Ingestion
+    if 'url' in req_data and req_data['url'].strip():
+        url_input = req_data['url'].strip()
+        try:
+            structured_doc_data = DocumentProcessor.extract_from_url(url_input)
+            original_text = structured_doc_data["text"]
+            file_type = "url"
+            page_title = structured_doc_data["metadata"].get("title", "").strip()
+            domain = structured_doc_data["metadata"].get("domain", "").strip()
+            filename = page_title if page_title else (f"Webpage: {domain}" if domain else url_input)
+        except Exception as e:
+            return jsonify({'error': f"Failed to analyze URL: {str(e)}"}), 400
+
+    # 2. File Upload
+    elif 'file' in request.files:
         file = request.files['file']
         if file.filename != '':
             if file and allowed_file(file.filename):
@@ -95,24 +143,41 @@ def upload_file():
                 file.save(filepath)
                 
                 try:
-                    doc_data = DocumentProcessor.extract_document(filepath)
-                    original_text = doc_data["text"]
+                    structured_doc_data = DocumentProcessor.extract_document(filepath)
+                    original_text = structured_doc_data["text"]
                 except Exception as e:
                     return jsonify({'error': str(e)}), 400
             else:
                 return jsonify({'error': 'Invalid file type. Allowed: .pdf, .docx, .txt'}), 400
 
-    if 'text' in request.form and request.form['text'].strip():
-        original_text = request.form['text'].strip()
+    # 3. Raw Text Input
+    if not original_text and 'text' in req_data and req_data['text'].strip():
+        original_text = req_data['text'].strip()
+        file_type = "txt"
+        filename = "Manual Input"
         
     if not original_text.strip():
-        return jsonify({'error': 'Document or text is empty or contains no extractable content.'}), 400
+        return jsonify({'error': 'Document or URL contains no extractable text content.'}), 400
 
     doc = Document(filename=filename, file_type=file_type, original_text=original_text)
     db.session.add(doc)
     db.session.commit()
 
-    return jsonify({'message': 'Upload successful', 'document': doc.to_dict()}), 201
+    # Cache structured doc data if available
+    if structured_doc_data:
+        try:
+            cache_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"doc_{doc.id}_data.json")
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                json.dump(structured_doc_data, f, ensure_ascii=False)
+        except Exception as e:
+            print(f"[Upload Cache Note]: {e}")
+
+    return jsonify({
+        'message': 'Upload successful', 
+        'document': doc.to_dict(),
+        'metadata': structured_doc_data.get('metadata') if structured_doc_data else None,
+        'sections_count': structured_doc_data.get('total_pages', 1) if structured_doc_data else 1
+    }), 201
 
 # =========================================================================
 # FAQ GENERATION & REGENERATION
@@ -138,9 +203,24 @@ def generate_faqs():
         if progress_catcher:
             progress_catcher.set("Extracting document content and analyzing sections...")
 
-        # Check if original file is in upload folder to preserve full page structure
+        # 1. Check if structured cached JSON exists (for URLs and enriched documents)
+        cache_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"doc_{doc.id}_data.json")
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], doc.filename)
-        if os.path.exists(filepath) and doc.file_type in ['pdf', 'docx']:
+
+        if os.path.exists(cache_path):
+            with open(cache_path, 'r', encoding='utf-8') as f:
+                doc_data = json.load(f)
+            if progress_catcher:
+                progress_catcher.set("Generating questions with local Ollama Qwen2.5 3B...")
+            nlp_results = nlp_pipeline.process_document_data(
+                doc_data=doc_data,
+                num_faqs=num_faqs,
+                faq_length=faq_length,
+                source_document=doc.filename,
+                question_focus=question_focus
+            )
+        # 2. Check if original file is in upload folder to preserve full page structure
+        elif os.path.exists(filepath) and doc.file_type in ['pdf', 'docx']:
             doc_data = DocumentProcessor.extract_document(filepath)
             if progress_catcher:
                 progress_catcher.set("Generating questions with local Ollama Qwen2.5 3B...")
@@ -151,6 +231,7 @@ def generate_faqs():
                 source_document=doc.filename,
                 question_focus=question_focus
             )
+        # 3. Fallback to raw text
         else:
             if progress_catcher:
                 progress_catcher.set("Generating questions with local Ollama Qwen2.5 3B...")
@@ -334,3 +415,40 @@ def download_test_excel():
         download_name="FAQForge_Test_Results_and_Accuracy.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+@api_bp.route('/tests/sandbox-generate', methods=['POST'])
+def test_sandbox_generate():
+    """Generates FAQs directly from a raw text block and performs immediate verification and categorization."""
+    data = request.json or {}
+    text = data.get("text", "").strip()
+    question_type = data.get("question_type", "all")
+    num_faqs = int(data.get("num_faqs", 3))
+    
+    if not text:
+        return jsonify({"error": "Text block required"}), 400
+        
+    try:
+        res = nlp_pipeline.process_text(
+            text=text,
+            num_faqs=num_faqs,
+            faq_length="medium",
+            source_document="Sandbox Input",
+            question_focus=question_type
+        )
+        
+        faqs = res.get("faqs", [])
+        verified_count = sum(1 for f in faqs if f.get("verification_status") == "verified")
+        types_found = [f.get("question_type", "Factual") for f in faqs]
+        
+        return jsonify({
+            "status": "success",
+            "total_faqs": len(faqs),
+            "verified_faqs": verified_count,
+            "grounding_rate": round((verified_count / len(faqs)) * 100, 1) if faqs else 100.0,
+            "question_types": types_found,
+            "faqs": faqs,
+            "keywords": res.get("keywords", []),
+            "entities": res.get("entities", [])
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

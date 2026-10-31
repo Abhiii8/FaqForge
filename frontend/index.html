@@ -134,6 +134,11 @@
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-tab-pane" type="button" role="tab">
+                                        <i class="bi bi-globe2 me-1"></i> Website URL
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-tab-pane" type="button" role="tab">
                                         <i class="bi bi-textarea-t me-1"></i> Paste Text
                                     </button>
@@ -176,6 +181,7 @@
                                         <span class="format-pill"><i class="bi bi-file-earmark-pdf text-danger"></i> PDF (Page-Tracked)</span>
                                         <span class="format-pill"><i class="bi bi-file-earmark-word" style="color: var(--primary-accent);"></i> DOCX</span>
                                         <span class="format-pill"><i class="bi bi-file-earmark-text text-secondary"></i> TXT</span>
+                                        <span class="format-pill"><i class="bi bi-globe2 text-success"></i> Web URLs</span>
                                     </div>
 
                                     <input type="file" id="fileInput" class="d-none" accept=".pdf,.docx,.txt">
@@ -184,6 +190,85 @@
                                     </button>
                                     
                                     <div id="fileNameDisplay" class="mt-3 w-100" style="max-width: 380px;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Website URL Ingestion Pane -->
+                            <div class="tab-pane fade h-100" id="url-tab-pane" role="tabpanel">
+                                <div class="d-flex flex-column h-100 gap-3">
+                                    <div>
+                                        <label class="form-label d-flex align-items-center justify-content-between mb-1" for="urlInput">
+                                            <span class="d-flex align-items-center gap-1.5 fw-semibold" style="font-size: 13.5px;">
+                                                <i class="bi bi-link-45deg text-primary fs-6"></i> Website or Documentation URL
+                                            </span>
+                                            <span class="technical-mono text-muted" style="font-size: 11px;">HTML5 & Section Extractor</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted border-end-0">
+                                                <i class="bi bi-globe2"></i>
+                                            </span>
+                                            <input type="url" id="urlInput" class="form-control border-start-0" placeholder="https://en.wikipedia.org/wiki/Artificial_intelligence" style="font-family: var(--font-ui); font-size: 13.5px;">
+                                            <button class="btn btn-outline-primary px-3" type="button" id="inspectUrlBtn">
+                                                <span id="inspectUrlBtnSpinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                                                <span id="inspectUrlBtnText"><i class="bi bi-search me-1"></i> Inspect URL</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick Test URL Chips -->
+                                    <div class="d-flex align-items-center flex-wrap gap-1">
+                                        <span class="text-muted technical-mono me-1" style="font-size: 11px;">Quick Test:</span>
+                                        <button type="button" class="btn btn-sm url-preset-chip py-0 px-2" data-url="https://en.wikipedia.org/wiki/Artificial_intelligence">
+                                            <i class="bi bi-wikipedia text-secondary me-1"></i> Wikipedia: AI
+                                        </button>
+                                        <button type="button" class="btn btn-sm url-preset-chip py-0 px-2" data-url="https://docs.python.org/3/tutorial/appetite.html">
+                                            <i class="bi bi-filetype-py text-warning me-1"></i> Python Tutorial
+                                        </button>
+                                        <button type="button" class="btn btn-sm url-preset-chip py-0 px-2" data-url="https://en.wikipedia.org/wiki/Fast_Fourier_transform">
+                                            <i class="bi bi-activity text-info me-1"></i> FFT Algorithm
+                                        </button>
+                                    </div>
+
+                                    <!-- URL Live Inspection Card (Appears after inspecting) -->
+                                    <div id="urlPreviewCard" class="url-preview-box d-none flex-grow-1 d-flex flex-column">
+                                        <div class="d-flex align-items-start justify-content-between mb-2">
+                                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                                <span class="badge border bg-white text-primary technical-mono" id="urlDomainBadge">
+                                                    <i class="bi bi-globe me-1"></i> Domain
+                                                </span>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle technical-mono" id="urlSectionCountBadge">
+                                                    <i class="bi bi-diagram-3 me-1"></i> 0 Sections
+                                                </span>
+                                            </div>
+                                            <span class="technical-mono text-muted" id="urlWordCountBadge" style="font-size: 11.5px;">0 words</span>
+                                        </div>
+                                        
+                                        <h4 class="card-heading text-truncate mb-1" id="urlPreviewTitle" style="font-size: 15px; color: var(--text-primary);">Webpage Title</h4>
+                                        <p class="text-muted small mb-2 text-truncate-2" id="urlPreviewDesc" style="line-height: 1.45; font-size: 12px;"></p>
+                                        
+                                        <!-- Detected Headings List -->
+                                        <div class="mb-2">
+                                            <div class="technical-mono text-muted mb-1" style="font-size: 10.5px;">DETECTED SECTIONS & CITATIONS:</div>
+                                            <div class="d-flex flex-wrap gap-1" id="urlHeadingsContainer" style="max-height: 55px; overflow-y: auto;"></div>
+                                        </div>
+
+                                        <!-- Sample Extracted Content Snippet -->
+                                        <div class="mt-auto pt-2 border-top">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <span class="technical-mono text-muted" style="font-size: 10.5px;">CLEAN EXTRACTED CONTENT:</span>
+                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 technical-mono" id="clearUrlBtn" style="font-size: 11px;">Clear URL</button>
+                                            </div>
+                                            <div class="technical-mono text-muted p-2 bg-light rounded" id="urlSampleText" style="font-size: 11.5px; max-height: 65px; overflow-y: auto; line-height: 1.4;">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Initial Placeholder State if not yet inspected -->
+                                    <div id="urlEmptyState" class="url-empty-placeholder flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center p-3">
+                                        <i class="bi bi-browser-chrome fs-1 text-muted opacity-50 mb-2"></i>
+                                        <h5 class="text-secondary mb-1" style="font-size: 14px; font-weight: 600;">Direct Webpage & Article Analysis</h5>
+                                        <p class="text-muted small mb-0" style="max-width: 380px;">Enter any documentation, Wikipedia article, or blog URL. FAQForge automatically strips scripts, navigation, and ads, extracting structured sections for grounded FAQ generation.</p>
+                                    </div>
                                 </div>
                             </div>
 

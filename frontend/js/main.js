@@ -170,8 +170,118 @@ if (textInputEl && textCharCountEl) {
     });
 }
 
+// URL Ingestion & Live Inspection
+const urlInput = document.getElementById('urlInput');
+const inspectUrlBtn = document.getElementById('inspectUrlBtn');
+const inspectUrlBtnSpinner = document.getElementById('inspectUrlBtnSpinner');
+const inspectUrlBtnText = document.getElementById('inspectUrlBtnText');
+const urlPreviewCard = document.getElementById('urlPreviewCard');
+const urlEmptyState = document.getElementById('urlEmptyState');
+const clearUrlBtn = document.getElementById('clearUrlBtn');
+
+async function inspectCurrentUrl(urlToInspect) {
+    const rawUrl = urlToInspect || (urlInput ? urlInput.value.trim() : '');
+    if (!rawUrl) {
+        showToast('Please enter a website URL to analyze.', 'error');
+        return;
+    }
+
+    if (inspectUrlBtnSpinner) inspectUrlBtnSpinner.classList.remove('d-none');
+    if (inspectUrlBtnText) inspectUrlBtnText.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Inspecting...';
+    if (inspectUrlBtn) inspectUrlBtn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_BASE}/url/inspect`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: rawUrl })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to inspect URL');
+
+        // Populate Preview Card
+        const titleEl = document.getElementById('urlPreviewTitle');
+        const descEl = document.getElementById('urlPreviewDesc');
+        const domainEl = document.getElementById('urlDomainBadge');
+        const secEl = document.getElementById('urlSectionCountBadge');
+        const wordsEl = document.getElementById('urlWordCountBadge');
+        const headingsEl = document.getElementById('urlHeadingsContainer');
+        const sampleEl = document.getElementById('urlSampleText');
+
+        if (titleEl) titleEl.textContent = data.title || 'Webpage Content';
+        if (descEl) descEl.textContent = data.description || 'Cleaned HTML content ready for semantic grounding.';
+        if (domainEl) domainEl.innerHTML = `<i class="bi bi-globe me-1"></i> ${data.domain || 'Web'}`;
+        if (secEl) secEl.innerHTML = `<i class="bi bi-diagram-3 me-1"></i> ${data.section_count} Sections`;
+        if (wordsEl) wordsEl.textContent = `${(data.total_words || 0).toLocaleString()} words`;
+
+        if (headingsEl) {
+            headingsEl.innerHTML = '';
+            (data.headings || []).forEach(h => {
+                const badge = document.createElement('span');
+                badge.className = 'badge border bg-white text-secondary technical-mono';
+                badge.style.fontSize = '10px';
+                badge.textContent = h;
+                headingsEl.appendChild(badge);
+            });
+            if (!data.headings || data.headings.length === 0) {
+                headingsEl.innerHTML = '<span class="text-muted technical-mono" style="font-size: 11px;">Single unified document body</span>';
+            }
+        }
+
+        if (sampleEl) {
+            sampleEl.textContent = data.sample_text || 'No text snippet available.';
+        }
+
+        if (urlPreviewCard) urlPreviewCard.classList.remove('d-none');
+        if (urlEmptyState) urlEmptyState.classList.add('d-none');
+
+        showToast(`Analyzed ${data.domain || 'webpage'}: ${data.total_words} words extracted!`, 'success');
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        if (inspectUrlBtnSpinner) inspectUrlBtnSpinner.classList.add('d-none');
+        if (inspectUrlBtnText) inspectUrlBtnText.innerHTML = '<i class="bi bi-search me-1"></i> Inspect URL';
+        if (inspectUrlBtn) inspectUrlBtn.disabled = false;
+    }
+}
+
+if (inspectUrlBtn) {
+    inspectUrlBtn.addEventListener('click', () => inspectCurrentUrl());
+}
+
+if (urlInput) {
+    urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            inspectCurrentUrl();
+        }
+    });
+}
+
+document.querySelectorAll('.url-preset-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const preset = btn.getAttribute('data-url');
+        if (urlInput && preset) {
+            urlInput.value = preset;
+            inspectCurrentUrl(preset);
+        }
+    });
+});
+
+if (clearUrlBtn) {
+    clearUrlBtn.addEventListener('click', () => {
+        if (urlInput) urlInput.value = '';
+        if (urlPreviewCard) urlPreviewCard.classList.add('d-none');
+        if (urlEmptyState) urlEmptyState.classList.remove('d-none');
+    });
+}
+
 if (generateBtn) {
     generateBtn.addEventListener('click', async () => {
+        const urlTabBtn = document.getElementById('url-tab');
+        const isUrlTab = urlTabBtn && urlTabBtn.classList.contains('active');
+        const urlVal = urlInput ? urlInput.value.trim() : '';
+
         const file = fileInput.files[0];
         const text = document.getElementById('textInput').value;
         const numFaqs = document.getElementById('numFaqs').value;
@@ -179,25 +289,45 @@ if (generateBtn) {
         const questionFocusEl = document.getElementById('questionFocus');
         const questionFocus = questionFocusEl ? questionFocusEl.value : 'all';
         
-        if (!file && !text.trim()) {
-            showToast('Please upload a file or paste text.', 'error');
-            return;
+        let usingUrl = false;
+        if (isUrlTab) {
+            if (!urlVal) {
+                showToast('Please enter a website URL to analyze.', 'error');
+                return;
+            }
+            usingUrl = true;
+        } else if (!file && !text.trim()) {
+            if (urlVal) {
+                usingUrl = true;
+            } else {
+                showToast('Please upload a file, enter a website URL, or paste text.', 'error');
+                return;
+            }
         }
         
         startProcessing();
         
         try {
-            // 1. Upload
-            const formData = new FormData();
-            if (file) formData.append('file', file);
-            if (text.trim()) formData.append('text', text);
-            
+            // 1. Upload / Ingest
             updateProgress('extracting', 'active');
-            
-            const uploadRes = await fetch(`${API_BASE}/upload`, {
-                method: 'POST',
-                body: formData
-            });
+            let uploadRes;
+
+            if (usingUrl) {
+                uploadRes = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlVal })
+                });
+            } else {
+                const formData = new FormData();
+                if (file) formData.append('file', file);
+                if (text.trim()) formData.append('text', text);
+                
+                uploadRes = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+            }
             
             const uploadData = await uploadRes.json();
             

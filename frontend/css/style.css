@@ -933,3 +933,42 @@ small, .text-xs, .metadata-text {
     max-height: 120px;
   }
 }
+
+/* --- Webpage URL Ingestion UI --- */
+.url-preset-chip {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: var(--radius-pill);
+  transition: all var(--transition-fast);
+}
+
+.url-preset-chip:hover {
+  background-color: var(--bg-selected);
+  border-color: var(--line-arch);
+  color: var(--primary-accent);
+}
+
+.url-preview-box {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--line-arch);
+  border-left: 3px solid var(--primary-accent);
+  border-radius: var(--radius-card);
+  padding: 1rem 1.15rem;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+}
+
+.url-empty-placeholder {
+  border: 1px dashed var(--line-arch);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-app);
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
